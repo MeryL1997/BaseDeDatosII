@@ -125,3 +125,16 @@ Entrada time,
 Salida time,
 primary key(Id_Auditoria)
 )engine=InnoDB;
+
+USE Spotify;
+insert into Rol(Nombre)
+VALUES('Invitado');
+insert into Rol ( Nombre) 
+values ( 'Premiun');
+insert into Rol ( Nombre) 
+values ('Administrador');
+insert into Rol (Nombre) 
+values ('Artista');
+
+USE Spotify;
+select * from Rol;
