@@ -1547,16 +1547,23 @@ insert into Cancion_Escuchada (Id_CE, Duracion_CE, Id_Usuario, Id_Cancion) value
 insert into Cancion_Escuchada (Id_CE, Duracion_CE, Id_Usuario, Id_Cancion) values (100, '13:26:32', 100, 100);
 
 select * from Auditoria;
-#view
+#reporte de los usuarios ingresado
 USE Spotify;
 CREATE VIEW ReporteIngresoUsuarios AS
 SELECT Usuario.Nombre_Usuario, Max(Auditoria.entrada)as Ultimo_Ingreso, count(Auditoria.Id_Usuario) as Cantidad_Ingreso
 FROM Usuario, Auditoria
 WHERE Auditoria.Procedimiento='Login' and Usuario.Id_Usuario=Auditoria.Id_Usuario and Auditoria.Id_Usuario group by  Auditoria.Id_Usuario;
-#view
-SELECT DISTINCT Nombre_Cancion, Nombre_Disco, Nombre_Artista, Numero_Visitas, count(Cancion_Escuchada.Id_Usuario) As cantida_Usuario
+
+#las canciones escuchado
+USE Spotify;
+CREATE VIEW Canciones_Mas_Escuchados AS
+SELECT DISTINCT Nombre_Cancion, Nombre_Disco, Nombre_Artista, Numero_Visitas, Cancion_Escuchada.Id_Usuario
 FROM Cancion, Disco, Artistas, Usuario, Cancion_Escuchada
-WHERE Cancion.Id_Disco = Disco.Id_Disco 
-AND Artistas.Id_Artista = Disco.Id_Artista
-AND Usuario.Id_Usuario = Cancion_Escuchada.Id_Usuario
-GROUP BY Nombre_Cancion and Cancion_Escuchada.Id_Usuario  ORDER BY Numero_Visitas DESC LIMIT 3  ;
+WHERE Cancion.Id_Disco = Disco.Id_Disco  AND Artistas.Id_Artista = Disco.Id_Artista AND Usuario.Id_Usuario = Cancion_Escuchada.Id_Usuario
+GROUP BY Nombre_Cancion ORDER BY Numero_Visitas DESC LIMIT 3;
+
+#Lista reproducion por usuarios con las canciones de sugerencias por cado uno
+USE Spotify;
+CREATE VIEW Reproducion_Cancion_Usuario AS
+SELECT Usuario.Nombre_Usuario, Lista_Reproduccion.Nombre_LR, Sugerencia_Canciones.Nombre_Sugerencia, Cancion.Nombre_Cancion
+FROM Usuario, Lista_Reproduccion,Sugerencia_Canciones,Cancion WHERE Usuario.Id_Usuario=Lista_Reproduccion.Id_Usuario and Cancion.Id_Cancion=Sugerencia_Canciones.Id_Cancion;
