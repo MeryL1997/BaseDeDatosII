@@ -7928,3 +7928,31 @@ insert  into `products`(`productCode`,`productName`,`productLine`,`productScale`
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+/*--------------Vistas-------------*/
+Use classicmodels;
+CREATE VIEW Productos_Mas_Vendido AS
+select p.productName, p.productLine, sum(quantityOrdered) as total_ventas, count(distinct c.customerNumber) as total_compradores
+from products p, orderdetails od, orders o, customers c
+where od.productCode = p.productCode
+and od.orderNumber = o.orderNumber
+and o.customerNumber = c.customerNumber
+group by p.productCode
+order by total_ventas desc;
+
+Use classicmodels;
+create procedure OrdenarProducto(
+orderNumberP int (11),
+orderDateP date ,
+requieredDateP date ,
+shippedDateP date ,
+statusP varchar(15) ,
+commentsP text,
+customerNumberP int(11) ,
+)
+As
+begin
+insert into orders([ordenNumber],[ordeDate],[requieredDate],[shippedDate],['status'],[comments],[customerNumber]values
+(orderNumberP,orderDateP,requieredDateP,shippedDateP,statusP,commentsP,customerNumberP) 
+end
+GO
