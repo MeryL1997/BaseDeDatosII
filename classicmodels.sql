@@ -7975,3 +7975,6 @@ insert into orders([ordenNumber],[ordeDate],[requieredDate],[shippedDate],['stat
 (orderNumberP,orderDateP,requieredDateP,shippedDateP,statusP,commentsP,customerNumberP) 
 end
 GO
+
+create procedure Ordenar_un_Producto()
+select * from products where productLine='Motorcycles'
