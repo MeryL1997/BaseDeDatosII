@@ -7968,8 +7968,7 @@ shippedDateP date ,
 statusP varchar(15) ,
 commentsP text,
 customerNumberP int(11) 
-)
-As
+)as
 begin
 insert into orders([ordenNumber],[ordeDate],[requieredDate],[shippedDate],['status'],[comments],[customerNumber]values
 (orderNumberP,orderDateP,requieredDateP,shippedDateP,statusP,commentsP,customerNumberP) 
