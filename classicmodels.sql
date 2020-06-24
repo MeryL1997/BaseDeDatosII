@@ -7942,38 +7942,235 @@ order by total_ventas desc;
 
 Use classicmodels;
 CREATE VIEW Cliente_mayor_cantidad_compras AS
-    SELECT 
-        COUNT(o.customerNumber) AS cantVentas,
-        c.customerName AS customerName,
-        SUM(od.quantityOrdered * od.priceEach) AS VentaTotal,
-        COUNT(DISTINCT od.productCode) AS ProductosDiferentes
-    FROM
-        ((classicmodels.customers c
-        JOIN classicmodels.orders o)
-        JOIN classicmodels.orderdetails od)
-    WHERE
-        c.customerNumber = o.customerNumber
-            AND o.orderNumber = od.orderNumber
-            AND o.orderDate BETWEEN CAST('2003-05-31' AS DATE) AND CAST('2004-05-31' AS DATE)
-    GROUP BY c.customerNumber
-    ORDER BY COUNT(o.customerNumber) DESC
-    LIMIT 1
+  select o.orderDate , c.customerName,  p.productName, sum(od.quantityOrdered*od.priceEach) VentaTotal, count(o.customerNumber) Clientes
+from customers c,products p, orderdetails od, orders o
+where p.productCode=od.productCode and o.orderNumber=od.orderNumber 
+
+order by orderDate desc
+limit 1;
 
 Use classicmodels;
-create procedure OrdenarProducto(
-orderNumberP int (11),
-orderDateP date ,
-requieredDateP date ,
-shippedDateP date ,
-statusP varchar(15) ,
-commentsP text,
-customerNumberP int(11) 
-)as
-begin
-insert into orders([ordenNumber],[ordeDate],[requieredDate],[shippedDate],['status'],[comments],[customerNumber]values
-(orderNumberP,orderDateP,requieredDateP,shippedDateP,statusP,commentsP,customerNumberP) 
-end
-GO
+DELIMITER //
+CREATE PROCEDURE Nuevo_Pedido (orderNumberP INT, orderDateP DATE, requiredDateP DATE,
+                                 shippedDateP DATE, statusP VARCHAR(15), commentsP TEXT,
+                                 customerNumberP INT, productCodeP VARCHAR(15),
+                                 quantityOrderedP INT, priceEachP DECIMAL(10, 2), orderLineNumberP SMALLINT)
+BEGIN
+    START TRANSACTION;
+            INSERT  INTO `orders`(`orderNumber`,`orderDate`,`requiredDate`,`shippedDate`,`status`,`comments`,`customerNumber`)
+            VALUES (orderNumberP,orderDateP,requiredDateP,shippedDateP,statusP,commentsP,customerNumberP);
 
-create procedure Ordenar_un_Producto()
-select * from products where productLine='Motorcycles'
+            INSERT  INTO `orderdetails`(`orderNumber`,`productCode`,`quantityOrdered`,`priceEach`,`orderLineNumber`)
+            VALUES  (orderNumberP,productCodeP,quantityOrderedP,priceEachP,orderLineNumberP);
+END //
+DELIMITER ;
+CALL ordenar_producto(4040, curdate(), curdate(), curdate(), 'recibido', NULL,
+              363, 'S18_1749', 20, 150.70, 7);
+              
+SELECT * FROM orderdetails WHERE orderNumber = 4040;
+
+SELECT * FROM orders WHERE orderNumber = 4040 ;
+
+#Disparadores
+use classicmodels;
+DROP TABLE IF EXISTS ProductlinesEliminados;
+CREATE TABLE ProductlinesEliminados
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    productLine VARCHAR(50) not null,
+    textDescription VARCHAR(4000),
+    htmlDescription MEDIUMTEXT,
+    image MEDIUMBLOB,
+    fecha_de_eliminacion TIMESTAMP DEFAULT NOW()
+);
+DROP TABLE IF EXISTS ProductsEliminados;
+CREATE TABLE ProductsEliminados
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    productCode varchar(15) not null,
+    productName varchar(70) not null,
+    productLine VARCHAR(50) not null,
+    productScale varchar(10) not null,
+    productVendor varchar(50) not null,
+    productDescription text not null,
+    quantityInStock smallint(6) not null,
+    buyPrice decimal(10,2) not null,
+    MSRP decimal(10,2) not null,
+    fecha_de_eliminacion TIMESTAMP DEFAULT NOW()
+);
+DROP TABLE IF EXISTS CustomersEliminados;
+CREATE TABLE CustomersEliminados
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    customerNumber int(11) not null,
+    customerName varchar(50) not null,
+    contactLastName varchar(50) not null,
+    contactFirstName varchar(50) not null,
+    phone varchar(50) not null,
+    addressLine1 varchar(50) not null,
+    addressLine2 varchar(50) ,
+    city varchar(50) not null,
+    state varchar(50),
+    postalCode varchar(15),
+    country varchar(50),
+    salesRepEmployeeNumber int(11),
+    creditLimit decimal(10,2),
+    fecha_de_eliminacion TIMESTAMP DEFAULT NOW()
+);
+#Crear los disparadores
+use classicmodels;
+DELIMITER //
+DROP TRIGGER IF EXISTS Before_Productline_Eliminar;
+CREATE TRIGGER Before_Productline_Eliminar
+    BEFORE DELETE
+    ON productlines
+    FOR EACH ROW
+BEGIN
+    INSERT INTO ProductlinesEliminados(productLine, textDescription, htmlDescription, image)
+    VALUES (OLD.productLine, OLD.textDescription, OLD.htmlDescription, OLD.image);
+END//
+DELIMITER ;
+DELIMITER aa
+DROP TRIGGER IF EXISTS Before_Product_Eliminar;
+CREATE TRIGGER Before_Product_Eliminar
+    BEFORE DELETE
+    ON products
+    FOR EACH ROW
+BEGIN
+    INSERT INTO ProductsEliminados(productCode, productName, productLine, productScale, productVendor, productDescription, quantityInStock, buyPrice, MSRP)
+    VALUES (OLD.productCode, OLD.productName, OLD.productLine, OLD.productScale, OLD.productVendor, OLD.productDescription, OLD.quantityInStock, OLD.buyPrice, OLD.MSRP);
+END aa
+
+
+DELIMITER ;
+use classicmodels;
+DELIMITER rr
+DROP TRIGGER IF EXISTS Before_Customer_Eliminar;
+CREATE TRIGGER Before_Customer_Eliminar
+    BEFORE DELETE
+    ON customers
+    FOR EACH ROW
+BEGIN
+    INSERT INTO CustomersEliminados( customerNumber, customerName, contactLastName, contactFirstName, phone, 
+    addressLine1, addressLine2, city, state, postalCode, country, salesRepEmployeeNumber, creditLimit)
+    VALUES (OLD.customerNumber, OLD.customerName, OLD.contactLastName, OLD.contactFirstName, OLD.phone, 
+    OLD.addressLine1, OLD.addressLine2, OLD.city, OLD.state, OLD.postalCode, OLD.country, OLD.salesRepEmployeeNumber, OLD.creditLimit);
+END rr
+
+DELIMITER ;
+#----consulta---
+insert into productlines(productLine, textDescription,htmlDescription,image)
+values('Job','Es un campo Job',null,null);
+SELECT * from productlines where productLine='Job';
+
+delete from productlines where productline='Job';
+select * from ProductlinesEliminados;
+#Registros que se elimina
+DROP TABLE IF EXISTS exEmployees;
+CREATE TABLE exEmployees
+(
+    id int primary key auto_increment,
+    employeeNumber int(11) not null,
+    lastName varchar(50) not null,
+    firstName varchar(50) not null,
+    extension varchar(10) not null,
+    email varchar(100) not null,
+    officeCode varchar(10) not null,
+    reportsTo int(11),
+    jobTitle varchar(50) not null,
+    fecha_de_eliminacion timestamp default now()
+);
+use classicmodels;
+DELIMITER //
+DROP TRIGGER IF EXISTS Before_Employee_Eliminar;
+CREATE TRIGGER Before_Employee_Eliminar
+    BEFORE DELETE
+    ON employees
+    FOR EACH ROW
+BEGIN
+    INSERT INTO exEmployees(employeeNumber, lastName, firstName, extension, email, officeCode, reportsTo, jobTitle)
+    VALUES (OLD.employeeNumber, OLD.lastName, OLD.firstName, OLD.extension, OLD.email, OLD.officeCode, OLD.reportsTo, OLD.jobTitle);
+END //
+DELIMITER ;
+
+#Ejecucion
+use classicmodels;
+insert into employees(employeeNumber,lastName,firstName,extension,email,officeCode,reportsTo,jobTitle)
+values(1900,'Mery','Lema','SD','merylema85@gmail.com',3,1102,'Deverlop');
+SELECT * from employees where employeeNumber=1900;
+
+
+delete from employees where employeeNumber=1900;
+select * from exEmployees;
+#Impedir
+DELIMITER //
+DROP TRIGGER IF EXISTS Before_Order_No_Eliminar;
+CREATE TRIGGER Before_Order_No_Eliminar
+   BEFORE DELETE ON orders
+FOR EACH ROW
+BEGIN
+   If Old.orderNumber is not null then
+   SIGNAL SQLSTATE '45000'
+   SET MESSAGE_TEXT = 'No puede eliminar este registro de la tabla orders';
+End If;
+END //
+DELIMITER ;
+
+DELIMITER //
+DROP TRIGGER IF EXISTS Before_Payments_No_Eliminar;
+CREATE TRIGGER Before_Payments_No_Eliminar
+   
+BEFORE DELETE ON payments
+FOR EACH ROW
+BEGIN
+   If Old.checkNumber is not null then
+   SIGNAL SQLSTATE '45000'
+   SET MESSAGE_TEXT = 'No puede eliminar este registro de la tabla payments';
+End If;
+END //
+DELIMITER ;
+delete from orders where orderNumber=10426;
+#Actualizaciones
+
+
+DROP TABLE IF EXISTS LogProducto; 
+CREATE TABLE LogProducto( 
+id int auto_increment, 
+productCode varchar(15), 
+dateLog timestamp default now(), 
+descripcion varchar(255) not null, 
+primary key (id, productCode) 
+); 
+#Disparador
+
+DELIMITER // 
+DROP TRIGGER IF EXISTS After_Insertar_Products; 
+create trigger After_Insertar_Products 
+after insert on products 
+for each row 
+Begin 
+		INSERT INTO LogProducto(productCode, descripcion) 
+        VALUES (new.productCode, CONCAT('Se ha insertado un nuevo producto: ', NEW.productName)); 
+End // 
+DELIMITER ; 
+
+
+DELIMITER // 
+DROP TRIGGER IF EXISTS After_Actualizar_Products; 
+create trigger After_Actualizar_Products 
+after update on products 
+for each row 
+Begin 
+		INSERT INTO LogProducto(productCode, descripcion) 
+        VALUES (old.productCode, CONCAT('Se ha actualizado un producto: ', old.productName)); 
+End // 
+DELIMITER ; 
+#ejecucion
+use classicmodels;
+insert into products (productCode,productName,productLine,productScale,productVendor,productDescription,quantityInStock,buyPrice,MSRP)
+values('Calza2020','zapato','Ships','1:45','Mery','Calzado',200,2.34,5.34);
+SELECT * from LogProducto;
+
+
+update products set productScale ='2:50'  where productCode='Calza2020';
+SELECT * from LogProducto;
