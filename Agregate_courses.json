@@ -1,0 +1,38 @@
+[
+  {
+    "_id": {"$oid": "5f13b5403af99338d814eabd"},
+    "level": "Excellent",
+    "name": "Computer Science",
+    "university": "USAL"
+  },
+  {
+    "_id": {"$oid": "5f13b5403af99338d814eabe"},
+    "level": "Intermediate",
+    "name": "Electronics",
+    "university": "USAL"
+  },
+  {
+    "_id": {"$oid": "5f13b5403af99338d814eabf"},
+    "level": "Excellent",
+    "name": "Communication",
+    "university": "USAL"
+  },
+  {
+    "_id": {"$oid": "5f13b65d3af99338d814eac4"},
+    "level": "Excellent",
+    "name": "Computer Science",
+    "university": "USAL"
+  },
+  {
+    "_id": {"$oid": "5f13b65d3af99338d814eac5"},
+    "level": "Intermediate",
+    "name": "Electronics",
+    "university": "USAL"
+  },
+  {
+    "_id": {"$oid": "5f13b65d3af99338d814eac6"},
+    "level": "Excellent",
+    "name": "Communication",
+    "university": "USAL"
+  }
+]

@@ -1,0 +1,114 @@
+[
+  {
+    "_id": {"$oid": "5f13b5403af99338d814eabb"},
+    "city": "Salamanca",
+    "country": "Spain",
+    "location": {
+      "type": "Point",
+      "coordinates": [-5.6722512, 17, 40.9607792]
+    },
+    "name": "USAL",
+    "students": [
+      {
+        "year": 2014,
+        "number": 24774
+      },
+      {
+        "year": 2015,
+        "number": 23166
+      },
+      {
+        "year": 2016,
+        "number": 21913
+      },
+      {
+        "year": 2017,
+        "number": 21715
+      }
+    ]
+  },
+  {
+    "_id": {"$oid": "5f13b5403af99338d814eabc"},
+    "city": "Salamanca",
+    "country": "Spain",
+    "location": {
+      "type": "Point",
+      "coordinates": [-5.6691191, 17, 40.9631732]
+    },
+    "name": "UPSA",
+    "students": [
+      {
+        "year": 2014,
+        "number": 4788
+      },
+      {
+        "year": 2015,
+        "number": 4821
+      },
+      {
+        "year": 2016,
+        "number": 6550
+      },
+      {
+        "year": 2017,
+        "number": 6125
+      }
+    ]
+  },
+  {
+    "_id": {"$oid": "5f13b65c3af99338d814eac2"},
+    "city": "Salamanca",
+    "country": "Spain",
+    "location": {
+      "type": "Point",
+      "coordinates": [-5.6722512, 17, 40.9607792]
+    },
+    "name": "USAL",
+    "students": [
+      {
+        "year": 2014,
+        "number": 24774
+      },
+      {
+        "year": 2015,
+        "number": 23166
+      },
+      {
+        "year": 2016,
+        "number": 21913
+      },
+      {
+        "year": 2017,
+        "number": 21715
+      }
+    ]
+  },
+  {
+    "_id": {"$oid": "5f13b65c3af99338d814eac3"},
+    "city": "Salamanca",
+    "country": "Spain",
+    "location": {
+      "type": "Point",
+      "coordinates": [-5.6691191, 17, 40.9631732]
+    },
+    "name": "UPSA",
+    "students": [
+      {
+        "year": 2014,
+        "number": 4788
+      },
+      {
+        "year": 2015,
+        "number": 4821
+      },
+      {
+        "year": 2016,
+        "number": 6550
+      },
+      {
+        "year": 2017,
+        "number": 6125
+      }
+    ]
+  }
+]

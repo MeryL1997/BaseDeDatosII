@@ -7970,7 +7970,14 @@ CALL ordenar_producto(4040, curdate(), curdate(), curdate(), 'recibido', NULL,
 SELECT * FROM orderdetails WHERE orderNumber = 4040;
 
 SELECT * FROM orders WHERE orderNumber = 4040 ;
-
+use classicmodels;
+DROP TABLE IF EXISTS list_order;
+CREATE TABLE list_order (
+  orderNumber tinyint NOT NULL,
+  nombre tinyint NOT NULL,
+  productName tinyint NOT NULL,
+  orderDate tinyint NOT NULL
+) ENGINE=MyISAM ;
 #Disparadores
 use classicmodels;
 DROP TABLE IF EXISTS ProductlinesEliminados;
@@ -8170,7 +8177,7 @@ use classicmodels;
 insert into products (productCode,productName,productLine,productScale,productVendor,productDescription,quantityInStock,buyPrice,MSRP)
 values('Calza2020','zapato','Ships','1:45','Mery','Calzado',200,2.34,5.34);
 SELECT * from LogProducto;
-
+SET character_set_client = @saved_cs_client;
 
 update products set productScale ='2:50'  where productCode='Calza2020';
 SELECT * from LogProducto;
